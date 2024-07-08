@@ -86,7 +86,6 @@ public class MovesCalculator {
         while (!possibleMoves.empty()) {
             Move source = possibleMoves.pop();
             if (source.toRow == destination.fromRow && source.toCol == destination.fromCol) {
-                System.out.println("found connected move");
                 connectedMoves.push(source);
                 destination = source;
             }
