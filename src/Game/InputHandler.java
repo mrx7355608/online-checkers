@@ -3,9 +3,11 @@ package Game;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class MoveHandler extends MouseAdapter {
+public class InputHandler extends MouseAdapter {
 
     Board board;
+    MovesCalculator movesCalculator;
+
     int fromRow;
     int fromCol;
     int toRow;
@@ -13,8 +15,9 @@ public class MoveHandler extends MouseAdapter {
     Piece selectedPiece;
     Piece capturedPiece;
 
-    public  MoveHandler(Board board) {
+    public InputHandler(Board board) {
         this.board = board;
+        this.movesCalculator = board.movesCalculator;
     }
 
 
@@ -23,7 +26,7 @@ public class MoveHandler extends MouseAdapter {
         fromRow = e.getY() / this.board.TILE_SIZE;
         fromCol = e.getX() / this.board.TILE_SIZE;
         this.selectedPiece = board.getPiece(fromRow, fromCol);
-        this.board.calculateMoves(this.selectedPiece, true, fromRow, fromCol);
+        this.movesCalculator.calculateMoves(this.selectedPiece, true, fromRow, fromCol);
         this.board.repaint();
     }
 
@@ -45,18 +48,16 @@ public class MoveHandler extends MouseAdapter {
         toCol = e.getX() / this.board.TILE_SIZE;
 
         if (this.selectedPiece != null) {
-            Move mm = board.isValidMove(toRow, toCol);
+            // If the move is valid, find all the moves that are connected to it.
+            // It is used to capture pieces where user jumps over multiple enemy pieces.
+            Move move = board.isValidMove(toRow, toCol);
 
-            if (mm != null) {
-                board.calculateConnectedMoves(mm);
-
-                while (!board.connectedMoves.isEmpty()) {
-                    Move m = board.connectedMoves.pop();
-                    board.makeMove(m);
+            if (move != null) {
+                movesCalculator.calculateConnectedMoves(move);
+                while (!movesCalculator.connectedMoves.isEmpty()) {
+                    board.makeMove(movesCalculator.connectedMoves.pop());
                 }
-
-                board.clearPossibleMoves();
-
+                movesCalculator.clearAll();
             } else {
                 selectedPiece.row = fromRow;
                 selectedPiece.col = fromCol;
