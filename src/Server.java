@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -23,8 +24,13 @@ public class Server {
             System.out.println(socket.getInetAddress() + " connected");
             if (onlineClients[0] == null) {
                 onlineClients[0] = socket;
-            } else {
+            } else if (onlineClients[1] == null) {
                 onlineClients[1] = socket;
+            } else {
+                PrintWriter out = new PrintWriter(socket.getOutputStream());
+                out.println("ERROR: A match is already in progress");
+                out.flush();
+                out.close();
             }
 
             // Spawn a new thread to receive messages from client
@@ -35,7 +41,7 @@ public class Server {
     }
 
     public static void broadcastMessage(String message) {
-
+        
     }
 
 }
