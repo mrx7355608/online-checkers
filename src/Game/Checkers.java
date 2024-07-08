@@ -1,6 +1,9 @@
 package Game;
 
 import javax.swing.*;
+import java.io.IOException;
+import java.net.Socket;
+import Client.*;
 
 public class Checkers extends JFrame {
 
@@ -16,28 +19,23 @@ public class Checkers extends JFrame {
 
     public static void main(String[] args) {
         // Take ip as input
-//        String ip = JOptionPane.showInputDialog("Enter server ip:");
-//        JOptionPane.showMessageDialog(null, "Connecting to server...");
+        String ip = JOptionPane.showInputDialog("Enter server ip:");
+        JOptionPane.showMessageDialog(null, "Connecting to server...");
 
-//        try {
+        try {
             // Connect to server
-//            Client client = Client.getInstance();
-//            Socket socket = client.connect(ip);
+            Client client = Client.getInstance();
+            Socket socket = client.connect(ip);
 
             // Spawn a new thread to receive server messages in parallel with game gui
-//            Thread thread = new Thread() {
-//                @Override
-//                public void run() {
-//                    new MoveHandler().receiveMessages(socket, checkersBoard);
-//                }
-//            };
-//            thread.start();
+            Thread thread = new Thread(new ServerEventsHandler(socket));
+            thread.start();
 
             // Start game gui on main thread
             new Checkers().setVisible(true);
 
-//        } catch (IOException e) {
-//            JOptionPane.showMessageDialog(null, "Unable to connect to server", "Connection Failed", JOptionPane.ERROR_MESSAGE);
-//        }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Unable to connect to server", "Connection Failed", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }
