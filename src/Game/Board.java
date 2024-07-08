@@ -91,7 +91,7 @@ public class Board extends JPanel {
 
             if (pieceAtDiagonal == null) {
                 if (checkEmpty) {
-                    moves.add(new Move(piece.row, piece.col, c.row, c.col, piece));
+                    possibleMoves.push(new Move(piece.row, piece.col, c.row, c.col, piece));
                 }
             }
             else {
@@ -110,7 +110,7 @@ public class Board extends JPanel {
                     if (this.getPiece(toRow, toCol) == null) {
                         if (toRow < 0 || toRow > 7 || toCol < 0 || toCol > 7)
                             continue;
-                        moves.add(new Move(initRow, initCol, toRow, toCol, piece, pieceAtDiagonal));
+                        possibleMoves.push(new Move(initRow, initCol, toRow, toCol, piece, pieceAtDiagonal));
                         calculateMoves(piece, false, toRow, toCol);
                     }
 
@@ -122,22 +122,24 @@ public class Board extends JPanel {
 
     public void clearPossibleMoves() {
         connectedMoves.clear();
-        moves.clear();
+        possibleMoves.clear();
     }
 
     public void calculateConnectedMoves(Move destination) {
         connectedMoves.push(destination);
 
-        for (Move source : moves) {
+        while (!possibleMoves.empty()) {
+            Move source = possibleMoves.pop();
             if (source.toRow == destination.fromRow && source.toCol == destination.fromCol) {
                 System.out.println("found connected move");
                 connectedMoves.push(source);
+                destination = source;
             }
         }
     }
 
     public Move isValidMove(int toRow, int toCol) {
-        for (Move m : moves) {
+        for (Move m : possibleMoves) {
             if (m.toRow == toRow && m.toCol == toCol) {
                 return m;
             }
@@ -159,7 +161,7 @@ public class Board extends JPanel {
         }
 
         // Highlight possible moves (if any)
-        for (Move m : moves) {
+        for (Move m : possibleMoves) {
             g.setColor(Color.pink);
             g.fillRect(m.toCol * TILE_SIZE, m.toRow * TILE_SIZE, TILE_SIZE, TILE_SIZE);
         }
