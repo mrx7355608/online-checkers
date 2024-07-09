@@ -4,10 +4,10 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 
 public class ClientHandler implements Runnable {
-    private final Socket socket;
+    private final Player player;
 
-    public ClientHandler(Socket socket) {
-        this.socket = socket;
+    public ClientHandler(Player player) {
+        this.player = player;
     }
 
     @Override
@@ -17,9 +17,7 @@ public class ClientHandler implements Runnable {
             String data;
 
             while (this.socket.isConnected()) {
-                if ((data = in.readLine()) != null) {
-                    System.out.println(data);
-                }
+
             }
 
         } catch (IOException e) {

@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
 
 public class Server {
 
-    private static final Socket[] onlineClients = new Socket[2];
+    private static final Player[] onlineClients = new Player[2];
 
     public static void main(String[] args) {
         ExecutorService executor = Executors.newFixedThreadPool(2);
@@ -21,15 +21,17 @@ public class Server {
 
             // Accept first client connection
             Socket socket1 = server.accept();
-            System.out.println(socket1.getInetAddress() + " connected");
-            onlineClients[0] = socket1;
-            executor.submit(new ClientHandler(socket1));
+            Player player1 = new Player("Player 1", "red", socket1);
+            onlineClients[0] = player1;
+            executor.submit(new ClientHandler(player1));
 
             // Accept second client connection
             Socket socket2 = server.accept();
-            System.out.println(socket2.getInetAddress() + " connected");
-            onlineClients[1] = socket2;
-            executor.submit(new ClientHandler(socket2));
+            Player player2 = new Player("Player 2", "black", socket2);
+            onlineClients[1] = player2;
+            executor.submit(new ClientHandler(player2));
+
+            // Broadcast a message to start game
             broadcastMessage("START_GAME: both clients connected");
 
         } catch (IOException e) {
@@ -38,17 +40,9 @@ public class Server {
     }
 
     public static void broadcastMessage(String message) {
-        for (Socket s : onlineClients) {
-            if (s == null)
-                continue;
-
-            try {
-                PrintWriter out = new PrintWriter(s.getOutputStream());
-                out.println(message);
-                out.flush();
-            } catch (IOException e) {
-                System.out.println(e.getMessage());
-            }
+        for (Player player: onlineClients) {
+            player.out.println(message);
+            player.out.flush();
         }
     }
 
