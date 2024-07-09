@@ -31,7 +31,7 @@ public class Server {
             onlineClients[1] = socket2;
             executor.submit(new ClientHandler(socket2));
             broadcastMessage("START_GAME: both clients connected");
-            
+
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
