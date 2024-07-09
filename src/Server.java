@@ -19,25 +19,19 @@ public class Server {
             ServerSocket server = new ServerSocket(5555);
             System.out.println("Server is listening on port: 5555");
 
-            while (true) {
-                // Accept a client connection
-                Socket socket = server.accept();
-                System.out.println(socket.getInetAddress() + " connected");
-                if (onlineClients[0] == null) {
-                    onlineClients[0] = socket;
-                } else if (onlineClients[1] == null) {
-                    onlineClients[1] = socket;
-                    broadcastMessage("START_GAME: both players have connected");
-                } else {
-                    PrintWriter out = new PrintWriter(socket.getOutputStream());
-                    out.println("ERROR: A match is already in progress");
-                    out.flush();
-                }
+            // Accept first client connection
+            Socket socket1 = server.accept();
+            System.out.println(socket1.getInetAddress() + " connected");
+            onlineClients[0] = socket1;
+            executor.submit(new ClientHandler(socket1));
 
-                // Spawn a new thread to receive messages from client
-                executor.submit(new ClientHandler(socket));
-            }
-
+            // Accept second client connection
+            Socket socket2 = server.accept();
+            System.out.println(socket2.getInetAddress() + " connected");
+            onlineClients[1] = socket2;
+            executor.submit(new ClientHandler(socket2));
+            broadcastMessage("START_GAME: both clients connected");
+            
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
